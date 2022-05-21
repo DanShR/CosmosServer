@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/confirmemail")
-    public ResponseEntity<?> confirmEmail(@RequestParam(required = true) String token) {
+    public ResponseEntity<?> confirmEmail(@RequestParam String token) {
         if (userService.confirmEmail(token)) {
             return new ResponseEntity<>("Email confirmed!",HttpStatus.OK);
         } else {
@@ -78,19 +78,19 @@ public class UserController {
 
     @GetMapping("/passwordrecovery/username")
     @ResponseBody
-    public ResponseEntity<?> passwordRecoveryByUsername(@RequestParam(required = true) String username) {
+    public ResponseEntity<?> passwordRecoveryByUsername(@RequestParam String username) {
         userService.recoverPasswordByUsername(username);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/passwordrecovery/email")
-    public ResponseEntity<?> passwordRecoveryByEmail(@RequestParam(required = true) String email) {
+    public ResponseEntity<?> passwordRecoveryByEmail(@RequestParam String email) {
         userService.recoverPasswordByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/passwordreset/{token}")
-    public ResponseEntity<?> passwordResetTokenValid(@PathVariable(required = true, name = "token") String token) {
+    public ResponseEntity<?> passwordResetTokenValid(@PathVariable(name = "token") String token) {
         if (userService.passwordResetTokenValid(token)) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {

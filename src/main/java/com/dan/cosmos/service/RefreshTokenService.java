@@ -35,15 +35,14 @@ public class RefreshTokenService {
 
         RefreshToken oldRefreshToken = findByToken(refreshTokenValue);
         if (oldRefreshToken == null) {
-            throw  new CustomException("Refresh token not found", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("Refresh token not found", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         refreshTokenRepository.delete(oldRefreshToken);
         validateRefreshtoken(oldRefreshToken);
 
-        RefreshToken newRefreshToken = createRefreshToken(oldRefreshToken.getAppUser(), request);
+        return createRefreshToken(oldRefreshToken.getAppUser(), request);
 
-        return newRefreshToken;
     }
 
     public boolean validateRefreshtoken(RefreshToken refreshToken) {

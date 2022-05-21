@@ -32,7 +32,7 @@ public class PostService {
 
     public boolean deletePostById(Long id) {
         Optional<Post> post = postRepository.findById(id);
-        if (!post.isPresent()) {
+        if (post.isEmpty()) {
             throw new CustomException("Post not found", HttpStatus.BAD_REQUEST);
         }
         postRepository.delete(post.get());

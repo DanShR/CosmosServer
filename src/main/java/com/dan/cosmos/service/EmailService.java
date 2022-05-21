@@ -13,13 +13,13 @@ public class EmailService {
     private final JavaMailSenderImpl mailSender;
     private final String baseUrl;
 
-    public EmailService(JavaMailSenderImpl mailSender, @Value("${base-url}") String baseUrl) {
+    public EmailService(JavaMailSenderImpl mailSender, @Value("${BASE_URL}") String baseUrl) {
         this.mailSender = mailSender;
         this.baseUrl = baseUrl;
     }
 
     public void sendConfirmEmail(AppUser appUser) {
-        String confirmUrl = String.format("%s/users/confirmemail?token=%s", baseUrl, appUser.getEmailConfirmUUID());
+        String confirmUrl = String.format("%sconfirmemail?token=%s", baseUrl, appUser.getEmailConfirmUUID());
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("cosmosapp");
         message.setTo(appUser.getEmail());
@@ -30,7 +30,7 @@ public class EmailService {
     }
 
     public void sendPasswordRecoveryEmail(AppUser appUser) {
-        String recoveryUrl = String.format("%s/passwordreset/%s", baseUrl, appUser.getPasswordRecoveryToken());
+        String recoveryUrl = String.format("%spasswordreset/%s", baseUrl, appUser.getPasswordRecoveryToken());
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("cosmosapp");
         message.setTo(appUser.getEmail());

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("posts")
 @RequiredArgsConstructor
 public class PostController {
 
@@ -36,16 +36,16 @@ public class PostController {
     }
 
     @DeleteMapping("/deletePost")
-    public ResponseEntity<?> deletePost(@RequestParam(required = true, name = "id") Long id) {
+    public ResponseEntity<?> deletePost(@RequestParam(name = "id") Long id) {
         if (postService.deletePostById(id)) {
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/updatepost")
-    public ResponseEntity<?> updatePost(@RequestParam(required = true, name = "id") Post oldPost, @RequestBody(required = true) PostDTO newPostDTO) {
+    public ResponseEntity<?> updatePost(@RequestParam(name = "id") Post oldPost, @RequestBody PostDTO newPostDTO) {
         Post post = postService.updatePost(oldPost, newPostDTO);
         return new ResponseEntity<>(modelMapper.map(post, PostDTO.class), HttpStatus.OK);
     }
