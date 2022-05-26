@@ -1,6 +1,9 @@
 package com.dan.cosmos.service;
 
 import com.dan.cosmos.exception.CustomException;
+import com.dan.cosmos.exception.userException.ExpiredRefreshTokenException;
+import com.dan.cosmos.exception.userException.RefreshTokenNotFoundException;
+import com.dan.cosmos.exception.userException.RefreshTokenNotPresentException;
 import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.RefreshToken;
 import com.dan.cosmos.repository.RefreshTokenRepository;
@@ -30,12 +33,12 @@ public class RefreshTokenService {
 
         String refreshTokenValue = resolveRefreshToken(request);
         if (refreshTokenValue == null) {
-            throw new CustomException("Refresh token not present", HttpStatus.BAD_REQUEST);
+            throw new RefreshTokenNotPresentException();
         }
 
         RefreshToken oldRefreshToken = findByToken(refreshTokenValue);
         if (oldRefreshToken == null) {
-            throw new CustomException("Refresh token not found", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RefreshTokenNotFoundException();
         }
 
         refreshTokenRepository.delete(oldRefreshToken);
@@ -48,7 +51,7 @@ public class RefreshTokenService {
     public boolean validateRefreshtoken(RefreshToken refreshToken) {
         Date now = new Date();
         if (refreshToken.getExpiresIn() < now.getTime()) {
-            throw new CustomException("Expired refresh token", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ExpiredRefreshTokenException();
         }
         return true;
     }

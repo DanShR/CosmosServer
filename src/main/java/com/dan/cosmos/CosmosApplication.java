@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class CosmosApplication implements CommandLineRunner {
+public class CosmosApplication {
 
 	final UserService userService;
 
@@ -28,32 +28,5 @@ public class CosmosApplication implements CommandLineRunner {
 		return new ModelMapper();
 	}
 
-	@Override
-	public void run(String... params) throws Exception {
-		if (userService.usersCount() != 0) {
-			return;
-		}
 
-		AppUser admin = new AppUser();
-		admin.setUsername("admin");
-		admin.setPassword("admin");
-		admin.setEmail("admin@email.com");
-		admin.setFirstName("admin");
-		admin.setLastName("admin");
-		admin.setEnabled(true);
-		admin.setAppUserRoles(new ArrayList<AppUserRole>(Arrays.asList(AppUserRole.ROLE_ADMIN)));
-
-		userService.signup(admin);
-
-		AppUser client = new AppUser();
-		client.setUsername("client");
-		client.setPassword("client");
-		client.setEmail("client@email.com");
-		client.setFirstName("client");
-		client.setLastName("client");
-		client.setEnabled(true);
-		client.setAppUserRoles(new ArrayList<AppUserRole>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
-
-		userService.signup(client);
-	}
 }

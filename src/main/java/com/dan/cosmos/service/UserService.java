@@ -1,13 +1,12 @@
 package com.dan.cosmos.service;
 
 import com.dan.cosmos.dto.ChangePasswordDTO;
-import com.dan.cosmos.exception.CustomException;
+import com.dan.cosmos.exception.userException.*;
 import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.AppUserRole;
 import com.dan.cosmos.repository.UserRepository;
 import com.dan.cosmos.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,22 +32,22 @@ public class UserService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             return userRepository.findByUsername(username);
         } catch (BadCredentialsException e) {
-            throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new InvalidUsernamePasswordException();
         } catch (DisabledException e) {
-            throw new CustomException("User disabled", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new UserDisabledException();
         } catch (LockedException e) {
-            throw new CustomException("User locked", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new UserLockedException();
         } catch (AuthenticationException e) {
-            throw new CustomException(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new UserAuthenticationException(e.getMessage());
         }
     }
 
     public boolean signup(AppUser appUser) {
         if (userRepository.existsByUsername(appUser.getUsername())) {
-            throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new UsernameExistException();
         }
         if (userRepository.existsByEmail(appUser.getEmail())) {
-            throw new CustomException("Email is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new EmailExistException();
         }
 
         if (appUser.getAppUserRoles() == null || appUser.getAppUserRoles().size() == 0) {
@@ -79,10 +78,10 @@ public class UserService {
     public boolean confirmEmail(String token) {
         AppUser appUser = userRepository.findByEmailConfirmUUID(token);
         if (appUser == null) {
-            throw new CustomException("User not found", HttpStatus.BAD_REQUEST);
+            throw new UserNotFoundException();
         }
         if (appUser.isEnabled()) {
-            throw new CustomException("Email already confirmed", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmailAlreadyConfirmedException();
         }
         appUser.setEnabled(true);
         userRepository.save(appUser);
@@ -101,7 +100,7 @@ public class UserService {
 
     public void recoverPassword(AppUser appUser) {
         if (appUser == null) {
-            throw new CustomException("User not found", HttpStatus.BAD_REQUEST);
+            throw new UserNotFoundException();
         }
         appUser.setPasswordRecoveryToken(UUID.randomUUID().toString());
         userRepository.save(appUser);
@@ -115,7 +114,7 @@ public class UserService {
     public boolean changePassword(ChangePasswordDTO changePasswordDTO) {
         AppUser appUser = userRepository.findByPasswordRecoveryToken(changePasswordDTO.getToken()) ;
         if (appUser == null) {
-            throw new CustomException("User not found", HttpStatus.BAD_REQUEST);
+            throw new UserNotFoundException();
         }
         return changeAppUserPassword(appUser, changePasswordDTO.getPassword());
     }

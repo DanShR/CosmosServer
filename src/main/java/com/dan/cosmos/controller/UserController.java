@@ -1,6 +1,7 @@
 package com.dan.cosmos.controller;
 
 import com.dan.cosmos.dto.ChangePasswordDTO;
+import com.dan.cosmos.dto.TokenDTO;
 import com.dan.cosmos.dto.UserResponseDTO;
 import com.dan.cosmos.dto.UserSignUpDTO;
 import com.dan.cosmos.model.AppUser;
@@ -28,14 +29,14 @@ public class UserController {
     private final ModelMapper modelMapper;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@RequestBody HashMap<String, String> body, HttpServletRequest request) {
+    public ResponseEntity<TokenDTO> login(@RequestBody HashMap<String, String> body, HttpServletRequest request) {
         AppUser appUser = userService.signin(body.get("username"), body.get("password"));
         String accessToken = userService.createAccessToken(appUser);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(appUser, request);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Set-Cookie", String.format("refresh-token=%s; HttpOnly; Path=/", refreshToken.getUUID()));
-        return new ResponseEntity<>(accessToken, headers, HttpStatus.OK);
+        return new ResponseEntity<TokenDTO>(new TokenDTO(accessToken), headers, HttpStatus.OK);
     }
 
     @PostMapping("/signup")
@@ -67,13 +68,13 @@ public class UserController {
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request) {
+    public ResponseEntity<TokenDTO> refresh(HttpServletRequest request) {
         RefreshToken newRefreshToken = refreshTokenService.generateNewRefreshToken(request);
         String accessToken = userService.createAccessToken(newRefreshToken.getAppUser());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Set-Cookie", String.format("refresh-token=%s; HttpOnly; Path=/", newRefreshToken.getUUID()));
-        return new ResponseEntity<>(accessToken, headers, HttpStatus.OK);
+        return new ResponseEntity<TokenDTO>(new TokenDTO(accessToken), headers, HttpStatus.OK);
     }
 
     @GetMapping("/passwordrecovery/username")

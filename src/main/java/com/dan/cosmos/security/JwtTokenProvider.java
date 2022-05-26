@@ -1,6 +1,7 @@
 package com.dan.cosmos.security;
 
 import com.dan.cosmos.exception.CustomException;
+import com.dan.cosmos.exception.userException.ExpiredInvalidTokenException;
 import com.dan.cosmos.model.AppUserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -87,7 +88,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            throw new CustomException("Expired or invalid JWT token", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ExpiredInvalidTokenException();
         }
     }
 }

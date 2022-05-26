@@ -1,26 +1,17 @@
 package com.dan.cosmos.exception;
 
-import org.springframework.http.HttpStatus;
+import lombok.Getter;
 
-public class CustomException extends RuntimeException {
+@Getter
+public class CustomException extends AbstractCustomException {
 
     private static final long serialVersionUID = 1L;
 
     private final String message;
-    private final HttpStatus httpStatus;
 
-
-    public CustomException(String message, HttpStatus httpStatus) {
+    public CustomException(String message) {
+        super(message);
         this.message = message;
-        this.httpStatus = httpStatus;
-    }
 
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
     }
 }

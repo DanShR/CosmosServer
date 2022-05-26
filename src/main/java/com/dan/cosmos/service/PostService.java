@@ -2,6 +2,7 @@ package com.dan.cosmos.service;
 
 import com.dan.cosmos.dto.PostDTO;
 import com.dan.cosmos.exception.CustomException;
+import com.dan.cosmos.exception.postException.PostNotFoundException;
 import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.Post;
 import com.dan.cosmos.repository.PostRepository;
@@ -33,7 +34,7 @@ public class PostService {
     public boolean deletePostById(Long id) {
         Optional<Post> post = postRepository.findById(id);
         if (post.isEmpty()) {
-            throw new CustomException("Post not found", HttpStatus.BAD_REQUEST);
+            throw new PostNotFoundException();
         }
         postRepository.delete(post.get());
         return true;
