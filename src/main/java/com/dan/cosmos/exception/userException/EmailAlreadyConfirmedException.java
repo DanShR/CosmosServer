@@ -1,8 +1,10 @@
 package com.dan.cosmos.exception.userException;
 
-import com.dan.cosmos.exception.AbstractCustomException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class EmailAlreadyConfirmedException extends AbstractCustomException {
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+public class EmailAlreadyConfirmedException extends RuntimeException {
     public EmailAlreadyConfirmedException() {
         super("Email already confirmed");
     }

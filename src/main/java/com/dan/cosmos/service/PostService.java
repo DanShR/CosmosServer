@@ -1,13 +1,11 @@
 package com.dan.cosmos.service;
 
 import com.dan.cosmos.dto.PostDTO;
-import com.dan.cosmos.exception.CustomException;
 import com.dan.cosmos.exception.postException.PostNotFoundException;
 import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.Post;
 import com.dan.cosmos.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

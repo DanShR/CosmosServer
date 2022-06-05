@@ -1,8 +1,10 @@
 package com.dan.cosmos.exception.userException;
 
-import com.dan.cosmos.exception.AbstractCustomException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class InvalidUsernamePasswordException extends AbstractCustomException {
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
+public class InvalidUsernamePasswordException extends RuntimeException {
     public InvalidUsernamePasswordException() {
         super("Invalid username/password supplied");
     }

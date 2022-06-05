@@ -1,8 +1,10 @@
 package com.dan.cosmos.exception.userException;
 
-import com.dan.cosmos.exception.AbstractCustomException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class ExpiredInvalidTokenException extends AbstractCustomException {
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
+public class ExpiredInvalidTokenException extends RuntimeException {
     public ExpiredInvalidTokenException() {
         super("Expired or invalid JWT token");
     }

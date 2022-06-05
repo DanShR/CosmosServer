@@ -42,7 +42,7 @@ public class UserService {
         }
     }
 
-    public boolean signup(AppUser appUser) {
+    public void signup(AppUser appUser) {
         if (userRepository.existsByUsername(appUser.getUsername())) {
             throw new UsernameExistException();
         }
@@ -57,7 +57,6 @@ public class UserService {
         appUser.setEmailConfirmUUID(UUID.randomUUID().toString());
         userRepository.save(appUser);
         emailService.sendConfirmEmail(appUser);
-        return true;
     }
 
     public AppUser aboutMe(HttpServletRequest request) {
@@ -75,7 +74,7 @@ public class UserService {
         return userRepository.count();
     }
 
-    public boolean confirmEmail(String token) {
+    public void confirmEmail(String token) {
         AppUser appUser = userRepository.findByEmailConfirmUUID(token);
         if (appUser == null) {
             throw new UserNotFoundException();
@@ -85,7 +84,6 @@ public class UserService {
         }
         appUser.setEnabled(true);
         userRepository.save(appUser);
-        return true;
     }
 
     public void recoverPasswordByUsername(String username) {
@@ -107,21 +105,22 @@ public class UserService {
         emailService.sendPasswordRecoveryEmail(appUser);        
     }
 
-    public boolean passwordResetTokenValid(String token) {
-        return userRepository.existsByPasswordRecoveryToken(token);
+    public void passwordResetTokenValid(String token) {
+        if (!userRepository.existsByPasswordRecoveryToken(token)) {
+            throw new UserNotFoundException();
+        }
     }
 
-    public boolean changePassword(ChangePasswordDTO changePasswordDTO) {
+    public void changePassword(ChangePasswordDTO changePasswordDTO) {
         AppUser appUser = userRepository.findByPasswordRecoveryToken(changePasswordDTO.getToken()) ;
         if (appUser == null) {
             throw new UserNotFoundException();
         }
-        return changeAppUserPassword(appUser, changePasswordDTO.getPassword());
+        changeAppUserPassword(appUser, changePasswordDTO.getPassword());
     }
 
-    public boolean changeAppUserPassword(AppUser appUser, String password) {
+    public void changeAppUserPassword(AppUser appUser, String password) {
         appUser.setPassword(passwordEncoder.encode(password));
         userRepository.save(appUser);
-        return true;
     }
 }

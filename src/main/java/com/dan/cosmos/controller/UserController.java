@@ -1,9 +1,6 @@
 package com.dan.cosmos.controller;
 
-import com.dan.cosmos.dto.ChangePasswordDTO;
-import com.dan.cosmos.dto.TokenDTO;
-import com.dan.cosmos.dto.UserResponseDTO;
-import com.dan.cosmos.dto.UserSignUpDTO;
+import com.dan.cosmos.dto.*;
 import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.RefreshToken;
 import com.dan.cosmos.service.RefreshTokenService;
@@ -14,14 +11,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -29,42 +29,36 @@ public class UserController {
     private final ModelMapper modelMapper;
 
     @PostMapping("/signin")
-    public ResponseEntity<TokenDTO> login(@RequestBody HashMap<String, String> body, HttpServletRequest request) {
-        AppUser appUser = userService.signin(body.get("username"), body.get("password"));
+    public ResponseEntity<TokenDTO> login(@RequestBody UserSignInDTO userSignInDTO, HttpServletRequest request) {
+        AppUser appUser = userService.signin(userSignInDTO.getUsername(), userSignInDTO.getPassword());
         String accessToken = userService.createAccessToken(appUser);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(appUser, request);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Set-Cookie", String.format("refresh-token=%s; HttpOnly; Path=/", refreshToken.getUUID()));
-        return new ResponseEntity<TokenDTO>(new TokenDTO(accessToken), headers, HttpStatus.OK);
+        return new ResponseEntity<>(new TokenDTO(accessToken), headers, HttpStatus.OK);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserSignUpDTO user) {
+    @ResponseStatus(HttpStatus.OK)
+    public void signup(@RequestBody UserSignUpDTO user) {
         AppUser appUser = modelMapper.map(user, AppUser.class);
-        if (userService.signup(appUser)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        userService.signup(appUser);
     }
 
     @GetMapping("/confirmemail")
-    public ResponseEntity<?> confirmEmail(@RequestParam String token) {
-        if (userService.confirmEmail(token)) {
-            return new ResponseEntity<>("Email confirmed!",HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public void confirmEmail(@Valid @NotBlank @RequestParam(name = "token") String token) {
+        userService.confirmEmail(token);
     }
 
     @GetMapping("/signout")
-    public ResponseEntity<?> signout(HttpServletRequest request) {
+    public ResponseEntity signout(HttpServletRequest request) {
         SecurityContextHolder.clearContext();
         refreshTokenService.removeRefreshToken(request);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Set-Cookie", "refresh-token=%s; HttpOnly; Path=/; Max-Age=0");
-        return new ResponseEntity<>(null, headers, HttpStatus.OK);
+        return new ResponseEntity(headers, HttpStatus.OK);
     }
 
     @GetMapping("/refresh")
@@ -74,37 +68,31 @@ public class UserController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Set-Cookie", String.format("refresh-token=%s; HttpOnly; Path=/", newRefreshToken.getUUID()));
-        return new ResponseEntity<TokenDTO>(new TokenDTO(accessToken), headers, HttpStatus.OK);
+        return new ResponseEntity<>(new TokenDTO(accessToken), headers, HttpStatus.OK);
     }
 
     @GetMapping("/passwordrecovery/username")
-    @ResponseBody
-    public ResponseEntity<?> passwordRecoveryByUsername(@RequestParam String username) {
+    @ResponseStatus(HttpStatus.OK)
+    public void passwordRecoveryByUsername(@RequestParam String username) {
         userService.recoverPasswordByUsername(username);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/passwordrecovery/email")
-    public ResponseEntity<?> passwordRecoveryByEmail(@RequestParam String email) {
+    @ResponseStatus(HttpStatus.OK)
+    public void passwordRecoveryByEmail(@RequestParam String email) {
         userService.recoverPasswordByEmail(email);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/passwordreset/{token}")
-    public ResponseEntity<?> passwordResetTokenValid(@PathVariable(name = "token") String token) {
-        if (userService.passwordResetTokenValid(token)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public void passwordResetTokenValid(@PathVariable(name = "token") String token) {
+        userService.passwordResetTokenValid(token);
     }
+
     @PostMapping("/changepassword")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        if (userService.changePassword(changePasswordDTO)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public void changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(changePasswordDTO);
     }
 
     @GetMapping("/me")

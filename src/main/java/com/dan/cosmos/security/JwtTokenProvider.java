@@ -1,6 +1,5 @@
 package com.dan.cosmos.security;
 
-import com.dan.cosmos.exception.CustomException;
 import com.dan.cosmos.exception.userException.ExpiredInvalidTokenException;
 import com.dan.cosmos.model.AppUserRole;
 import io.jsonwebtoken.Claims;
@@ -9,7 +8,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

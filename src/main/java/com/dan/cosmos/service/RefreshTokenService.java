@@ -1,6 +1,5 @@
 package com.dan.cosmos.service;
 
-import com.dan.cosmos.exception.CustomException;
 import com.dan.cosmos.exception.userException.ExpiredRefreshTokenException;
 import com.dan.cosmos.exception.userException.RefreshTokenNotFoundException;
 import com.dan.cosmos.exception.userException.RefreshTokenNotPresentException;
@@ -8,7 +7,6 @@ import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.RefreshToken;
 import com.dan.cosmos.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -57,16 +55,20 @@ public class RefreshTokenService {
     }
 
     public String resolveRefreshToken(HttpServletRequest request) {
-        Cookie refreshTokenCookie = Arrays.stream(request.getCookies())
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new RefreshTokenNotPresentException();
+        }
+        Cookie refreshTokenCookie = Arrays.stream(cookies)
                 .filter(c -> "refresh-token".equals(c.getName()))
                 .findFirst()
                 .orElse(null);
 
-        if (refreshTokenCookie != null) {
-            return refreshTokenCookie.getValue();
+        if (refreshTokenCookie == null) {
+            throw new RefreshTokenNotPresentException();
         }
 
-        return null;
+        return refreshTokenCookie.getValue();
     }
 
     public RefreshToken createRefreshToken(AppUser appUser, HttpServletRequest request) {
@@ -96,10 +98,10 @@ public class RefreshTokenService {
 
     public void removeRefreshToken(HttpServletRequest request) {
         String refreshTokenValue = resolveRefreshToken(request);
-        if (refreshTokenValue == null) {
-            return;
-        }
         RefreshToken refreshToken = findByToken(refreshTokenValue);
+        if (refreshToken == null) {
+            throw new RefreshTokenNotFoundException();
+        }
         deleteRefreshToken(refreshToken);
     }
 }

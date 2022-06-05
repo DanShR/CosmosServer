@@ -1,8 +1,10 @@
 package com.dan.cosmos.exception.userException;
 
-import com.dan.cosmos.exception.AbstractCustomException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class RefreshTokenNotPresentException extends AbstractCustomException {
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+public class RefreshTokenNotPresentException extends RuntimeException {
     public RefreshTokenNotPresentException() {
         super("Refresh token not present");
     }
