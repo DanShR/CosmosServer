@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import javax.servlet.http.Cookie;
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,8 +59,7 @@ public class RefreshTokenTests {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        RefreshToken oldRefreshToken = refreshTokenRepository.findByUUID(tokens.get("refreshToken"));
-        assertTrue(oldRefreshToken == null);
+        assertNull(refreshTokenRepository.findByUUID(tokens.get("refreshToken")));
     }
 
     @Test

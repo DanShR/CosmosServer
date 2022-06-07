@@ -1,6 +1,5 @@
 package com.dan.cosmos.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

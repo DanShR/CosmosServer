@@ -46,12 +46,11 @@ public class RefreshTokenService {
 
     }
 
-    public boolean validateRefreshtoken(RefreshToken refreshToken) {
+    public void validateRefreshtoken(RefreshToken refreshToken) {
         Date now = new Date();
         if (refreshToken.getExpiresIn() < now.getTime()) {
             throw new ExpiredRefreshTokenException();
         }
-        return true;
     }
 
     public String resolveRefreshToken(HttpServletRequest request) {

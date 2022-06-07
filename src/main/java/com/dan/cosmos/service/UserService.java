@@ -1,6 +1,7 @@
 package com.dan.cosmos.service;
 
 import com.dan.cosmos.dto.ChangePasswordDTO;
+import com.dan.cosmos.event.EventPublisher;
 import com.dan.cosmos.exception.userException.*;
 import com.dan.cosmos.model.AppUser;
 import com.dan.cosmos.model.AppUserRole;
@@ -25,6 +26,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final EventPublisher eventPublisher;
 
     public AppUser signin(String username, String password) {
 
@@ -56,7 +58,7 @@ public class UserService {
         appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         appUser.setEmailConfirmUUID(UUID.randomUUID().toString());
         userRepository.save(appUser);
-        emailService.sendConfirmEmail(appUser);
+        eventPublisher.publishSignUpEvent(appUser);
     }
 
     public AppUser aboutMe(HttpServletRequest request) {
@@ -102,7 +104,7 @@ public class UserService {
         }
         appUser.setPasswordRecoveryToken(UUID.randomUUID().toString());
         userRepository.save(appUser);
-        emailService.sendPasswordRecoveryEmail(appUser);        
+        eventPublisher.publishRecoverPasswordEvent(appUser);
     }
 
     public void passwordResetTokenValid(String token) {
