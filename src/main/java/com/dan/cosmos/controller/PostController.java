@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,9 +32,13 @@ public class PostController {
         return new ResponseEntity<>(postDtoList, HttpStatus.OK);
     }
 
-    @PostMapping("/newpost")
-    public ResponseEntity<?> addPost(@AuthenticationPrincipal MyUserDetails myUserDetails, @RequestBody PostDTO postDTO) {
-        Post post =  postService.createPost(myUserDetails.getAppUser(), postDTO.getText());
+    @PostMapping(value = "/newpost")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PostDTO> addPost(@AuthenticationPrincipal MyUserDetails myUserDetails,
+                                           @RequestPart(name = "file", required = false) MultipartFile file,
+                                           @RequestPart(name = "text") String text) {
+
+        Post post =  postService.createPost(myUserDetails.getAppUser(), text, file);
         return new ResponseEntity<>(modelMapper.map(post, PostDTO.class), HttpStatus.OK);
     }
 

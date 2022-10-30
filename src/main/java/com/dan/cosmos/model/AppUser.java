@@ -63,6 +63,6 @@ public class AppUser {
     @ElementCollection(fetch = FetchType.EAGER)
     List<AppUserRole> appUserRoles;
 
-    @OneToMany(mappedBy = "appUser")
+    @OneToMany(mappedBy = "appUser", fetch = FetchType.LAZY)
     private Set<Post> posts;
 }

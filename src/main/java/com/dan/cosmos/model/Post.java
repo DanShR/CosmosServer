@@ -24,6 +24,9 @@ public class Post {
     @Column(name = "created")
     private Date created;
 
+    @Column(name = "filename")
+    private String filename;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser appUser;

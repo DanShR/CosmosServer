@@ -1,5 +1,7 @@
-package com.dan.cosmos.security;
+package com.dan.cosmos.config;
 
+import com.dan.cosmos.security.JwtTokenFilterConfigurer;
+import com.dan.cosmos.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users/passwordrecovery/*").permitAll()
                 .antMatchers("/users/passwordreset/*").permitAll()
                 .antMatchers("/users/changepassword").permitAll()
+                .antMatchers("/img/*").permitAll()
                 .antMatchers("/users/me").hasAnyRole("ADMIN", "CLIENT")
                 .antMatchers("/posts/**").hasAnyRole("ADMIN", "CLIENT")
                 .anyRequest().authenticated();
