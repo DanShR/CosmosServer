@@ -6,5 +6,5 @@ import lombok.Data;
 public class QueueSignUpDTO {
     private String username;
     private String email;
-    private String passwordRecoveryToken;
+    private String emailConfirmUUID;
 }
